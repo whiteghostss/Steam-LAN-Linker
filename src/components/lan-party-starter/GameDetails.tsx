@@ -77,6 +77,23 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
     fetchConfig();
   }, [game, toast, t]);
 
+  if (isLoading) {
+    return (
+       <div className="p-6">
+         <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-4 w-1/4" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+            </CardContent>
+        </Card>
+       </div>
+    )
+  }
+
   return (
     <main className="flex-1 p-6">
       <Tabs defaultValue="dashboard" className="h-full space-y-6">
@@ -95,20 +112,7 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
           </TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard">
-          {isLoading ? (
-             <Card>
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-4 w-1/4" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-20 w-full" />
-                </CardContent>
-            </Card>
-          ) : (
-            <MainDashboard game={game} gameState={gameState} gameConfig={gameConfig} onGameStateChange={onGameStateChange} />
-          )}
+          <MainDashboard game={game} gameState={gameState} gameConfig={gameConfig} onGameStateChange={onGameStateChange} />
         </TabsContent>
         <TabsContent value="lobby">
           <LanLobby />
