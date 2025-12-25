@@ -1,5 +1,5 @@
-# Firebase Studio
+# Steam LAN Linker
 
-This is a NextJS starter in Firebase Studio.
+This project is a LAN party starter kit built with Next.js. It's designed to help manage game sessions in a local network environment.
 
-To get started, take a look at src/app/page.tsx.
+To get started, explore the main application file at `src/app/page.tsx`.
