@@ -25,6 +25,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/useI18n';
 
 type PingResult = {
   latency: number;
@@ -39,6 +40,7 @@ const mockPlayers = [
 
 export function LanLobby() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [ipAddress, setIpAddress] = useState('');
   const [isPinging, setIsPinging] = useState(false);
   const [pingResult, setPingResult] = useState<PingResult | null>(null);
@@ -46,8 +48,8 @@ export function LanLobby() {
   const handlePing = () => {
     if (!ipAddress) {
       toast({
-        title: 'IP Address Required',
-        description: 'Please enter an IP address to test.',
+        title: t('toasts.ipRequired.title'),
+        description: t('toasts.ipRequired.description'),
         variant: 'destructive',
       });
       return;
@@ -64,8 +66,8 @@ export function LanLobby() {
         });
       } else {
         toast({
-          title: 'Connection Failed',
-          description: `Could not reach ${ipAddress}. Check the IP and network connection.`,
+          title: t('toasts.connectionFailed.title'),
+          description: t('toasts.connectionFailed.description', { ipAddress }),
           variant: 'destructive',
         });
       }
@@ -75,8 +77,8 @@ export function LanLobby() {
   
   const handleWhitelist = () => {
     toast({
-        title: 'Firewall Rule Added',
-        description: `This application has been whitelisted in Windows Firewall.`,
+        title: t('toasts.firewallRuleAdded.title'),
+        description: t('toasts.firewallRuleAdded.description'),
     })
   }
 
@@ -84,25 +86,25 @@ export function LanLobby() {
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Connection Tester</CardTitle>
+          <CardTitle>{t('lanLobby.connectionTester.title')}</CardTitle>
           <CardDescription>
-            Manually test the connection to another player on your LAN.
+            {t('lanLobby.connectionTester.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="ip-input">Player's LAN IP Address</Label>
+            <Label htmlFor="ip-input">{t('lanLobby.connectionTester.ipLabel')}</Label>
             <div className="flex gap-2">
               <Input
                 id="ip-input"
-                placeholder="e.g., 192.168.1.101"
+                placeholder={t('lanLobby.connectionTester.ipPlaceholder')}
                 value={ipAddress}
                 onChange={(e) => setIpAddress(e.target.value)}
                 disabled={isPinging}
               />
               <Button onClick={handlePing} disabled={isPinging}>
                 <Wifi className="mr-2 h-4 w-4" />
-                Ping
+                {t('lanLobby.connectionTester.pingButton')}
               </Button>
             </div>
           </div>
@@ -116,17 +118,17 @@ export function LanLobby() {
           {pingResult && (
             <div className="rounded-lg border p-4 space-y-2 animate-in fade-in-50">
                 <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Activity className="h-4 w-4"/>Latency</span>
+                    <span className="text-muted-foreground flex items-center gap-2"><Activity className="h-4 w-4"/>{t('lanLobby.pingResult.latency')}</span>
                     <span className="font-medium">{pingResult.latency} ms</span>
                 </div>
                 <Separator />
                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Network className="h-4 w-4"/>Packet Loss</span>
+                    <span className="text-muted-foreground flex items-center gap-2"><Network className="h-4 w-4"/>{t('lanLobby.pingResult.packetLoss')}</span>
                     <span className="font-medium">{pingResult.packetLoss} %</span>
                 </div>
                  <Separator />
                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2"><Activity className="h-4 w-4"/>Jitter</span>
+                    <span className="text-muted-foreground flex items-center gap-2"><Activity className="h-4 w-4"/>{t('lanLobby.pingResult.jitter')}</span>
                     <span className="font-medium">{pingResult.jitter} ms</span>
                 </div>
             </div>
@@ -137,8 +139,8 @@ export function LanLobby() {
       <div className="space-y-6">
         <Card>
             <CardHeader>
-                <CardTitle>LAN Peers</CardTitle>
-                <CardDescription>Players discovered on your network.</CardDescription>
+                <CardTitle>{t('lanLobby.lanPeers.title')}</CardTitle>
+                <CardDescription>{t('lanLobby.lanPeers.description')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ul className="space-y-3">
@@ -153,7 +155,7 @@ export function LanLobby() {
                             </div>
                             <div className="flex items-center gap-2 text-sm text-green-400">
                                 <CircleDot className="h-4 w-4" />
-                                <span>{player.status}</span>
+                                <span>{t(player.status === 'Online' ? 'lanLobby.lanPeers.statusOnline' : 'lanLobby.lanPeers.statusOffline')}</span>
                             </div>
                         </li>
                     ))}
@@ -162,20 +164,20 @@ export function LanLobby() {
         </Card>
         <Card>
             <CardHeader>
-                <CardTitle>Firewall & Ports</CardTitle>
-                <CardDescription>Check for common connection blockers.</CardDescription>
+                <CardTitle>{t('lanLobby.firewall.title')}</CardTitle>
+                <CardDescription>{t('lanLobby.firewall.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                    <p className="flex items-center gap-2 text-muted-foreground"><ShieldCheck className="h-4 w-4" />Goldberg Port (UDP)</p>
-                    <span className="font-medium flex items-center gap-2 text-green-400"><Check className="h-4 w-4" />Open</span>
+                    <p className="flex items-center gap-2 text-muted-foreground"><ShieldCheck className="h-4 w-4" />{t('lanLobby.firewall.goldbergPort')}</p>
+                    <span className="font-medium flex items-center gap-2 text-green-400"><Check className="h-4 w-4" />{t('lanLobby.firewall.statusOpen')}</span>
                 </div>
                  <div className="flex items-center justify-between text-sm">
-                    <p className="flex items-center gap-2 text-muted-foreground"><ShieldOff className="h-4 w-4" />Windows Firewall</p>
-                    <span className="font-medium flex items-center gap-2 text-red-400"><Check className="h-4 w-4" />Blocking</span>
+                    <p className="flex items-center gap-2 text-muted-foreground"><ShieldOff className="h-4 w-4" />{t('lanLobby.firewall.windowsFirewall')}</p>
+                    <span className="font-medium flex items-center gap-2 text-red-400"><Check className="h-4 w-4" />{t('lanLobby.firewall.statusBlocking')}</span>
                 </div>
                 <Button variant="outline" className="w-full" onClick={handleWhitelist}>
-                    Add Firewall Exception
+                    {t('lanLobby.firewall.addExceptionButton')}
                     <ChevronRight className="h-4 w-4 ml-2"/>
                 </Button>
             </CardContent>

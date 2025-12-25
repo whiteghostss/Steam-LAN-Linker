@@ -5,6 +5,7 @@ import { Game } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/hooks/useI18n';
 
 type GameListProps = {
   games: Game[];
@@ -13,12 +14,14 @@ type GameListProps = {
 };
 
 export function GameList({ games, selectedGame, onSelectGame }: GameListProps) {
+  const { t } = useI18n();
+
   return (
     <aside className="w-64 border-r bg-card/50">
       <ScrollArea className="h-full">
         <div className="p-4">
           <h2 className="mb-4 text-lg font-semibold tracking-tight font-headline">
-            Your Games
+            {t('gameList.title')}
           </h2>
           <div className="grid grid-cols-2 gap-4">
             {games.map((game) => {

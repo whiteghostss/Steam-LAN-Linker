@@ -32,6 +32,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/useI18n';
 import { StatusIndicator } from './StatusIndicator';
 
 type MainDashboardProps = {
@@ -48,6 +49,7 @@ export function MainDashboard({
   onGameStateChange,
 }: MainDashboardProps) {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -61,8 +63,8 @@ export function MainDashboard({
           setIsProcessing(false);
           onGameStateChange({ isDeployed: true });
           toast({
-            title: 'Deployment Successful',
-            description: `${game.name} is now ready for LAN play.`,
+            title: t('toasts.deploymentSuccessful.title'),
+            description: t('toasts.deploymentSuccessful.description', { gameName: game.name }),
             variant: 'default',
           });
           return 100;
@@ -82,8 +84,8 @@ export function MainDashboard({
           setIsProcessing(false);
           onGameStateChange({ isDeployed: false });
           toast({
-            title: 'Restore Complete',
-            description: `${game.name} has been restored to Steam mode.`,
+            title: t('toasts.restoreComplete.title'),
+            description: t('toasts.restoreComplete.description', { gameName: game.name }),
             variant: 'default',
           });
           return 100;
@@ -96,15 +98,15 @@ export function MainDashboard({
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Copied to Clipboard',
-      description: `${label} has been copied.`,
+      title: t('toasts.copiedToClipboard.title'),
+      description: t('toasts.copiedToClipboard.description', { label }),
     });
   };
   
   const handleStartGame = () => {
     toast({
-        title: 'Starting Game...',
-        description: `Launching ${game.name}. Please ensure Steam is closed.`,
+        title: t('toasts.startingGame.title'),
+        description: t('toasts.startingGame.description', { gameName: game.name }),
     });
   };
 
@@ -126,58 +128,58 @@ export function MainDashboard({
               <div className="space-y-2">
                 <Progress value={progress} className="w-full" />
                 <p className="text-sm text-muted-foreground text-center">
-                  {gameState.isDeployed ? 'Restoring original files...' : 'Deploying Goldberg emulator...'}
+                  {gameState.isDeployed ? t('mainDashboard.status.restoring') : t('mainDashboard.status.deploying')}
                 </p>
               </div>
             )}
             {!isProcessing && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button onClick={handleDeploy} disabled={gameState.isDeployed}>
-                  <Wrench className="mr-2 h-4 w-4" /> Deploy LAN Mode
+                  <Wrench className="mr-2 h-4 w-4" /> {t('mainDashboard.buttons.deploy')}
                 </Button>
                 <Button
                   onClick={handleRestore}
                   disabled={!gameState.isDeployed}
                   variant="outline"
                 >
-                  <RotateCcw className="mr-2 h-4 w-4" /> Restore to Steam
+                  <RotateCcw className="mr-2 h-4 w-4" /> {t('mainDashboard.buttons.restore')}
                 </Button>
               </div>
             )}
             <div className="pt-4">
                 <Button onClick={handleStartGame} disabled={!gameState.isDeployed} className="w-full" size="lg">
-                    <Rocket className="mr-2 h-4 w-4" /> Start Game in LAN Mode
+                    <Rocket className="mr-2 h-4 w-4" /> {t('mainDashboard.buttons.startGame')}
                 </Button>
             </div>
           </CardContent>
           <CardFooter className="text-xs text-muted-foreground">
             <Info className="h-4 w-4 mr-2 shrink-0" />
-            Deploying backs up original files and injects the LAN emulator. Restore reverts all changes.
+            {t('mainDashboard.footer')}
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Identity & Network</CardTitle>
+            <CardTitle>{t('mainDashboard.identity.title')}</CardTitle>
             <CardDescription>
-              Set your unique identity for LAN sessions.
+              {t('mainDashboard.identity.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="nickname">In-Game Nickname</Label>
+              <Label htmlFor="nickname">{t('mainDashboard.identity.nicknameLabel')}</Label>
               <Input
                 id="nickname"
                 value={gameState.nickname}
                 onChange={(e) => onGameStateChange({ nickname: e.target.value })}
-                placeholder="Enter your desired name"
+                placeholder={t('mainDashboard.identity.nicknamePlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="steamid">Generated SteamID</Label>
+              <Label htmlFor="steamid">{t('mainDashboard.identity.steamIdLabel')}</Label>
               <div className="flex items-center gap-2">
                 <Input id="steamid" value={gameState.steamId} readOnly />
-                <Button variant="ghost" size="icon" onClick={() => handleCopy(gameState.steamId, 'SteamID')}>
+                <Button variant="ghost" size="icon" onClick={() => handleCopy(gameState.steamId, t('mainDashboard.identity.steamIdLabel'))}>
                     <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -188,33 +190,33 @@ export function MainDashboard({
         {gameConfig && (
         <Card>
             <CardHeader>
-                <CardTitle>Compatibility Report</CardTitle>
+                <CardTitle>{t('mainDashboard.compatReport.title')}</CardTitle>
                 <CardDescription>
-                Automated analysis for {game.name}.
+                {t('mainDashboard.compatReport.description', { gameName: game.name })}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">3rd Party DRM (e.g. Denuvo)</span>
+                    <span className="text-muted-foreground">{t('mainDashboard.compatReport.drm')}</span>
                     <div className="flex items-center gap-2 font-medium">
                         {gameConfig.has_denuvo ? <XCircle className="h-5 w-5 text-red-500" /> : <CheckCircle className="h-5 w-5 text-green-500" />}
-                        <span>{gameConfig.has_denuvo ? "Detected" : "Not Detected"}</span>
+                        <span>{gameConfig.has_denuvo ? t('mainDashboard.compatReport.detected') : t('mainDashboard.compatReport.notDetected')}</span>
                     </div>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Seamless Co-op Mod</span>
+                    <span className="text-muted-foreground">{t('mainDashboard.compatReport.seamlessCoop')}</span>
                      <div className="flex items-center gap-2 font-medium">
                         {gameConfig.needs_seamless_mod ? <CheckCircle className="h-5 w-5 text-blue-500" /> : <XCircle className="h-5 w-5 text-muted-foreground" />}
-                        <span>{gameConfig.needs_seamless_mod ? "Recommended" : "Not Required"}</span>
+                        <span>{gameConfig.needs_seamless_mod ? t('mainDashboard.compatReport.recommended') : t('mainDashboard.compatReport.notRequired')}</span>
                     </div>
                 </div>
                  <Separator />
                  <div className="flex flex-col space-y-2">
-                    <span className="text-muted-foreground">Default Save Path</span>
+                    <span className="text-muted-foreground">{t('mainDashboard.compatReport.savePath')}</span>
                     <div className="flex items-center gap-2">
                         <code className="text-xs bg-muted p-2 rounded-md font-mono w-full break-all">{gameConfig.save_path}</code>
-                        <Button variant="ghost" size="icon" onClick={() => handleCopy(gameConfig.save_path, 'Save Path')}>
+                        <Button variant="ghost" size="icon" onClick={() => handleCopy(gameConfig.save_path, t('mainDashboard.compatReport.savePath'))}>
                             <Copy className="h-4 w-4" />
                         </Button>
                     </div>
@@ -222,7 +224,7 @@ export function MainDashboard({
             </CardContent>
             <CardFooter className="text-xs text-muted-foreground">
                 <Info className="h-4 w-4 mr-2 shrink-0" />
-                This data is from a cloud compatibility database.
+                {t('mainDashboard.compatReport.footer')}
             </CardFooter>
         </Card>
         )}

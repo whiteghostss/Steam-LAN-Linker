@@ -14,6 +14,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/useI18n';
 import { LanLobby } from './LanLobby';
 import { MainDashboard } from './MainDashboard';
 import { SaveManager } from './SaveManager';
@@ -46,6 +47,7 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
   const [gameConfig, setGameConfig] = useState<GameConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { t } = useI18n();
 
   useEffect(() => {
     async function fetchConfig() {
@@ -61,8 +63,8 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
       } catch (error) {
         console.warn('AI flow `getGameConfig` failed. Using fallback mock data.', error);
         toast({
-          title: 'Cloud DB Unreachable',
-          description: 'Using local compatibility data.',
+          title: t('toasts.cloudDbUnreachable.title'),
+          description: t('toasts.cloudDbUnreachable.description'),
           variant: 'default',
         });
         // Fallback to mock data
@@ -73,7 +75,7 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
       }
     }
     fetchConfig();
-  }, [game, toast]);
+  }, [game, toast, t]);
 
   return (
     <main className="flex-1 p-6">
@@ -81,15 +83,15 @@ export function GameDetails({ game, gameState, onGameStateChange }: GameDetailsP
         <TabsList>
           <TabsTrigger value="dashboard">
             <Gamepad2 className="mr-2 h-4 w-4" />
-            Dashboard
+            {t('gameDetails.tabs.dashboard')}
           </TabsTrigger>
           <TabsTrigger value="lobby">
             <Network className="mr-2 h-4 w-4" />
-            LAN Lobby
+            {t('gameDetails.tabs.lobby')}
           </TabsTrigger>
           <TabsTrigger value="saves">
             <Save className="mr-2 h-4 w-4" />
-            Save Manager
+            {t('gameDetails.tabs.saves')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="dashboard">

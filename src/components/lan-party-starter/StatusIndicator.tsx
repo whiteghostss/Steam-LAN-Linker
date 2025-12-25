@@ -1,12 +1,14 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/hooks/useI18n';
 
 type StatusIndicatorProps = {
   isReady: boolean;
 };
 
 export function StatusIndicator({ isReady }: StatusIndicatorProps) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center gap-2">
       <span
@@ -14,7 +16,7 @@ export function StatusIndicator({ isReady }: StatusIndicatorProps) {
         aria-hidden="true"
       />
       <span className="text-sm text-muted-foreground">
-        {isReady ? 'LAN Mode Ready' : 'Steam Mode'}
+        {isReady ? t('status.lanMode') : t('status.steamMode')}
       </span>
     </div>
   );

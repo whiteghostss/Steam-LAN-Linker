@@ -7,6 +7,7 @@ import { GameDetails } from '@/components/lan-party-starter/GameDetails';
 import { GameList } from '@/components/lan-party-starter/GameList';
 import { Header } from '@/components/lan-party-starter/Header';
 import { games as initialGames } from '@/lib/games';
+import { I18nProvider } from '@/hooks/useI18n';
 
 // Function to generate a random 17-digit SteamID
 const generateSteamId = () => {
@@ -20,6 +21,7 @@ const generateSteamId = () => {
 export default function Home() {
   const [games] = useState<Game[]>(initialGames);
   const [selectedGame, setSelectedGame] = useState<Game | null>(games[0] || null);
+  const [language, setLanguage] = useState<'en' | 'zh'>('en');
   
   const [gameStates, setGameStates] = useState<Record<string, GameState>>(() => {
       const initialStates: Record<string, GameState> = {};
@@ -50,34 +52,36 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <GameList
-          games={games}
-          selectedGame={selectedGame}
-          onSelectGame={handleSelectGame}
-        />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <main className="flex-1 overflow-y-auto">
-            {selectedGame && gameStates[selectedGame.appid] ? (
-              <GameDetails game={selectedGame} gameState={gameStates[selectedGame.appid]} onGameStateChange={(newState) => handleGameStateChange(selectedGame.appid, newState)} />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                  <h2 className="text-2xl font-headline font-semibold">Welcome to LAN Party Starter</h2>
-                  <p className="text-muted-foreground mt-2">
-                    Select a game from the left to get started.
-                  </p>
+    <I18nProvider language={language}>
+      <div className="flex flex-col h-screen bg-background text-foreground">
+        <Header onLanguageChange={setLanguage} />
+        <div className="flex flex-1 overflow-hidden">
+          <GameList
+            games={games}
+            selectedGame={selectedGame}
+            onSelectGame={handleSelectGame}
+          />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <main className="flex-1 overflow-y-auto">
+              {selectedGame && gameStates[selectedGame.appid] ? (
+                <GameDetails game={selectedGame} gameState={gameStates[selectedGame.appid]} onGameStateChange={(newState) => handleGameStateChange(selectedGame.appid, newState)} />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-headline font-semibold">Welcome to LAN Party Starter</h2>
+                    <p className="text-muted-foreground mt-2">
+                      Select a game from the left to get started.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </main>
-          <footer className="border-t p-4 flex justify-center items-center">
-            <Disclaimer />
-          </footer>
+              )}
+            </main>
+            <footer className="border-t p-4 flex justify-center items-center">
+              <Disclaimer />
+            </footer>
+          </div>
         </div>
       </div>
-    </div>
+    </I18nProvider>
   );
 }

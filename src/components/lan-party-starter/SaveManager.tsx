@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import type { Game, GameState } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/hooks/useI18n';
 
 type SaveManagerProps = {
   game: Game;
@@ -41,33 +42,34 @@ const mockSnapshots = [
 
 export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerProps) {
   const { toast } = useToast();
+  const { t } = useI18n();
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Path Copied',
-      description: 'The directory path has been copied to your clipboard.',
+      title: t('toasts.pathCopied.title'),
+      description: t('toasts.pathCopied.description'),
     });
   };
   
   const handleImport = () => {
     toast({
-        title: 'Importing Steam Save',
-        description: `Simulating import of latest Steam save for ${game.name}.`,
+        title: t('toasts.importingSteamSave.title'),
+        description: t('toasts.importingSteamSave.description', { gameName: game.name }),
     });
   };
   
   const handleBackup = () => {
     toast({
-        title: 'Manual Backup Created',
-        description: `A new save snapshot has been created.`,
+        title: t('toasts.manualBackupCreated.title'),
+        description: t('toasts.manualBackupCreated.description'),
     });
   };
 
   const handleRollback = (id: number) => {
      toast({
-        title: 'Rollback Successful',
-        description: `Save snapshot #${id} has been restored.`,
+        title: t('toasts.rollbackSuccessful.title'),
+        description: t('toasts.rollbackSuccessful.description', { snapshotId: id }),
     });
   }
 
@@ -75,14 +77,14 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
     <div className="grid md:grid-cols-2 gap-6 items-start">
       <Card>
         <CardHeader>
-          <CardTitle>Save Game Sync</CardTitle>
+          <CardTitle>{t('saveManager.sync.title')}</CardTitle>
           <CardDescription>
-            Manage and transfer your save files between modes.
+            {t('saveManager.sync.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Original Steam Save Path</Label>
+            <Label>{t('saveManager.sync.steamPathLabel')}</Label>
             <div className="flex gap-2">
                 <Input readOnly value="%APPDATA%/Roaming/EldenRing/..." />
                 <Button variant="ghost" size="icon" onClick={() => handleCopy('%APPDATA%/Roaming/EldenRing/...')}>
@@ -91,7 +93,7 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
             </div>
           </div>
           <div className="space-y-2">
-            <Label>LAN Mode (Goldberg) Save Path</Label>
+            <Label>{t('saveManager.sync.lanPathLabel')}</Label>
              <div className="flex gap-2">
                 <Input readOnly value="%APPDATA%/Roaming/Goldberg SteamEmu Saves/1245620/..." />
                  <Button variant="ghost" size="icon" onClick={() => handleCopy('%APPDATA%/Roaming/Goldberg SteamEmu Saves/1245620/...')}>
@@ -101,23 +103,23 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
           </div>
           <Button className="w-full" variant="outline" onClick={handleImport}>
             <FolderSymlink className="mr-2 h-4 w-4" />
-            Import Latest Steam Save to LAN Mode
+            {t('saveManager.sync.importButton')}
           </Button>
         </CardContent>
         <CardFooter className="text-xs text-muted-foreground">
-            This action copies and renames your Steam save for Goldberg compatibility.
+            {t('saveManager.sync.footer')}
         </CardFooter>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Save Snapshots & Backups</CardTitle>
+          <CardTitle>{t('saveManager.backups.title')}</CardTitle>
           <CardDescription>
-            Create and manage automatic save backups.
+            {t('saveManager.backups.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="backup-path">Custom Backup Directory</Label>
+            <Label htmlFor="backup-path">{t('saveManager.backups.customDirectoryLabel')}</Label>
             <div className="flex gap-2">
               <Input
                 id="backup-path"
@@ -131,7 +133,7 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
             </div>
           </div>
           <div className="space-y-3">
-            <Label>Auto-Backup Frequency: {gameState.backupFrequency} mins</Label>
+            <Label>{t('saveManager.backups.frequencyLabel', { minutes: gameState.backupFrequency })}</Label>
             <Slider
               value={[gameState.backupFrequency]}
               onValueChange={(value) => onGameStateChange({ backupFrequency: value[0] })}
@@ -143,15 +145,15 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
            <Separator />
            <Button className="w-full" onClick={handleBackup}>
               <Save className="mr-2 h-4 w-4" />
-              Create Manual Backup Now
+              {t('saveManager.backups.backupButton')}
             </Button>
         </CardContent>
       </Card>
 
       <Card className="md:col-span-2">
         <CardHeader>
-            <CardTitle>Backup History</CardTitle>
-            <CardDescription>Restore your game to a previous state.</CardDescription>
+            <CardTitle>{t('saveManager.history.title')}</CardTitle>
+            <CardDescription>{t('saveManager.history.description')}</CardDescription>
         </CardHeader>
         <CardContent>
             <ScrollArea className="h-48">
@@ -161,14 +163,14 @@ export function SaveManager({ game, gameState, onGameStateChange }: SaveManagerP
                             <div className="flex items-center gap-3">
                                 <History className="h-5 w-5 text-muted-foreground" />
                                 <div>
-                                    <p className="font-medium text-sm">Snapshot #{snapshot.id}</p>
+                                    <p className="font-medium text-sm">{t('saveManager.history.snapshotLabel', { id: snapshot.id })}</p>
                                     <p className="text-xs text-muted-foreground">{snapshot.timestamp} ({snapshot.size})</p>
                                 </div>
                             </div>
                             <div className="flex gap-2">
                                 <Button size="sm" variant="outline" onClick={() => handleRollback(snapshot.id)}>
                                     <UploadCloud className="h-4 w-4 mr-2"/>
-                                    Restore
+                                    {t('saveManager.history.restoreButton')}
                                 </Button>
                                  <Button size="sm" variant="destructive-outline">
                                     <Trash2 className="h-4 w-4"/>
